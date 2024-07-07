@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.testapp.meta.name }}
+  namespace: {{ .Values.testapp.meta.namespace }}
+  labels:
+    app: {{ .Values.testapp.meta.label }}
+spec:
+  replicas: {{ .Values.testapp.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.testapp.rollingupdate.maxunavailable }}
+      maxSurge: {{ .Values.testapp.rollingupdate.maxsurge }}
+  minReadySeconds: {{ .Values.testapp.rollingupdate.minreadyseconds }}
+  selector:
+    matchLabels:
+      app: {{ .Values.testapp.meta.label }}
+  template:
+    metadata:
+      name: {{ .Values.testapp.meta.name }}
+      labels:
+        app: {{ .Values.testapp.meta.label }}
+    spec:
+      containers:
+        - name: {{ .Values.testapp.meta.name }}
+          image: "{{ .Values.testapp.image.repository }}:{{ .Values.testapp.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.testapp.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.testapp.ports.containerport}}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.testapp.httpget.port }}
+            initialDelaySeconds: {{ .Values.testapp.http.initialdelayseconds }}
+            timeoutSeconds: {{ .Values.testapp.http.timeoutseconds }}
+            periodSeconds: {{ .Values.testapp.http.periodseconds }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.testapp.httpget.port }}
+            initialDelaySeconds: {{ .Values.testapp.http.initialdelayseconds }}
+            timeoutSeconds: {{ .Values.testapp.http.timeoutseconds }}
+            periodSeconds: {{ .Values.testapp.http.periodseconds }}
+          resources:
+            requests:
+              cpu: {{ .Values.testapp.requests.cpu }}
+              memory: {{ .Values.testapp.requests.memory }}
+            limits:
+              cpu: {{ .Values.testapp.limits.cpu }}
+              memory: {{ .Values.testapp.limits.memory }}
+

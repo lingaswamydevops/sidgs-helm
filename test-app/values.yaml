@@ -1,0 +1,45 @@
+testapp:
+  replicaCount: 2
+
+  meta:
+    name: games-app
+    label: games-app-lable
+    namespace: dev
+  rollingupdate:
+    maxunavailable: 1
+    maxsurge: 1
+    minreadyseconds: 50
+
+  ports:
+    containerport: 80
+
+  httpget:
+    port: 80
+  http:
+    initialdelayseconds: 50
+    timeoutseconds: 2
+    periodseconds: 15
+
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 600m
+    memory: 1Gi
+
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 3
+    targetaverageutilization: 70
+
+  image:
+    repository: alexwhen/docker-2048   # nginx #582461434625.dkr.ecr.ap-south-1.amazonaws.com/java-web-app
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetport: 80
+
